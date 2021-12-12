@@ -72,7 +72,6 @@ class Person(BaseModel):
     #     }
 
 
-
 # Path operation decorator
 @app.get('/')
 def home():
@@ -91,14 +90,15 @@ def show_person(
         min_length=1,
         max_length=50,
         title='Person name',
-        description='This is the person name. It is between 1 and 50 characters'
+        description='This is the person name. It is between 1 and 50 characters',
+        example='Dulce'
         ),
     age: str = Query(
         ...,
         title='Person age',
-        description='This is the person age. It is required'
+        description='This is the person age. It is required',
+        example=22
         )
-    
 ):
     return {name: age}
 
@@ -108,8 +108,9 @@ def show_person(
     person_id: int = Path(
         ...,
         gt=0,
-        title="Person ID",
-        description='This is the person ID. It is required'
+        title='Person ID',
+        description='This is the person ID. It is required',
+        example=30
         )
 ):
     return {person_id: 'It exists!'}
@@ -121,7 +122,8 @@ def update_person(
         ...,
         title='Person ID',
         description='This is the person ID. It is required',
-        gt=0
+        gt=0,
+        example=32
     ),
     person: Person = Body(...),
     location: Location = Body(...)
