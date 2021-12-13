@@ -1,3 +1,4 @@
+# Server: uvicorn main:app --reload
 # Python
 from typing import Optional
 from enum import Enum # Para validar enumeraciones de strings
@@ -37,7 +38,7 @@ class Location(BaseModel):
         example='México'
     )
 
-class Person(BaseModel):
+class PersonBase(BaseModel):
     first_name: str = Field(
         ...,
         min_length=1,
@@ -58,6 +59,9 @@ class Person(BaseModel):
         )
     hair_color: Optional[HairColor] = Field(default=None, example='black')
     is_married: Optional[bool] = Field(default=None, example='False')
+
+
+class Person(PersonBase):
     password: str = Field(
         ...,
         min_length=8
@@ -73,27 +77,8 @@ class Person(BaseModel):
     #         }
     #     }
 
-class PersonOut(BaseModel):
-    first_name: str = Field(
-    ...,
-    min_length=1,
-    max_length=50,
-    example='John'
-    )
-    last_name: str = Field(
-        ...,
-        min_length=1,
-        max_length=50,
-        example='McLane'
-        )
-    age: int = Field(
-        ...,
-        gt=0,
-        le=115,
-        example='25'
-        )
-    hair_color: Optional[HairColor] = Field(default=None, example='black')
-    is_married: Optional[bool] = Field(default=None, example='False')
+class PersonOut(PersonBase):
+    pass
 
 # Path operation decorator
 @app.get('/')
