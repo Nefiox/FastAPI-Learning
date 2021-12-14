@@ -1,7 +1,8 @@
 # Server: uvicorn main:app --reload
 # Python
 from typing import Optional
-from enum import Enum # Para validar enumeraciones de strings
+from enum import Enum
+from fastapi.datastructures import DefaultType # Para validar enumeraciones de strings
 
 # Pydantic (FastAPI funciona sobre Pydantic, es por eso que se pone abajo)
 from pydantic import BaseModel
@@ -10,7 +11,7 @@ from pydantic import Field # Para validar modelos
 # FastAPI
 from fastapi import FastAPI
 from fastapi import status
-from fastapi import Body, Query, Path
+from fastapi import Body, Query, Path, Form
 from starlette.status import HTTP_200_OK
 
 app = FastAPI()
@@ -62,7 +63,6 @@ class PersonBase(BaseModel):
     hair_color: Optional[HairColor] = Field(default=None, example='black')
     is_married: Optional[bool] = Field(default=None, example='False')
 
-
 class Person(PersonBase):
     password: str = Field(
         ...,
@@ -81,6 +81,14 @@ class Person(PersonBase):
 
 class PersonOut(PersonBase):
     pass
+
+class LoginOut(BaseModel):
+    username: str = Field(
+        ...,
+        max_length=20,
+        example='john2021'
+    )
+    message: str = Field(default='Login Successfully!')
 
 # Path operation decorator
 @app.get(
@@ -157,3 +165,14 @@ def update_person(
     results = person.dict()
     results.update(location.dict())
     return results
+
+@app.post(
+    path='/login',
+    response_model=LoginOut,
+    status_code=status.HTTP_200_OK
+)
+def login(
+    username: str = Form(...),
+    password: str = Form(...)
+    ):
+    return LoginOut
