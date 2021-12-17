@@ -175,4 +175,4 @@ def login(
     username: str = Form(...),
     password: str = Form(...)
     ):
-    return LoginOut
+    return LoginOut(username=username)
