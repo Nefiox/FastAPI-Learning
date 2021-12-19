@@ -1,8 +1,7 @@
 # Server: uvicorn main:app --reload
 # Python
 from typing import Optional
-from enum import Enum
-from fastapi.datastructures import DefaultType # Para validar enumeraciones de strings
+from enum import Enum # Para validar enumeraciones de strings 
 
 # Pydantic (FastAPI funciona sobre Pydantic, es por eso que se pone abajo)
 from pydantic import BaseModel
@@ -12,8 +11,8 @@ from pydantic import EmailStr # Para validar emails
 # FastAPI
 from fastapi import FastAPI
 from fastapi import status
-from fastapi import Body, Query, Path, Form, Header, Cookie
-from starlette.status import HTTP_200_OK
+from fastapi import HTTPException
+from fastapi import Body, Query, Path, Form, Header, Cookie, UploadFile, File
 
 app = FastAPI()
 
@@ -131,6 +130,8 @@ def show_person(
 ):
     return {name: age}
 
+persons = [1, 2, 3, 4, 5, 6, 7]
+
 # Validaciones: Path Parameters
 @app.get(
     path='/person/detail/{person_id}',
@@ -145,6 +146,11 @@ def show_person(
         example=30
         )
 ):
+    if person_id not in persons:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='This person does not exist!'
+        )
     return {person_id: 'It exists!'}
 
 # Validaciones: Request Body
@@ -205,3 +211,18 @@ def contact(
     ads: Optional[str] = Cookie(default=None)
 ):
     return user_agent
+
+# Files
+
+@app.post(
+    path='/post-image'
+)
+def post_image(
+    # FastAPI utiliza dos clases para trabajar con archivos: UploadFile para definir el tipo de la variable o parámetro y File para definir el valor que va a contener esa variable o parámetro.
+    image: UploadFile = File(...)
+):
+    return {
+        'Filename': image.filename,
+        'Format': image.content_type,
+        'Size(kb)': round(len(image.file.read())/1024, ndigits=2)
+    }
